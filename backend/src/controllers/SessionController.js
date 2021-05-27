@@ -28,8 +28,8 @@ module.exports = {
       });
       id = id.toString();
 
-      var id_criptografado = await cryptography.sha512(id, salt);
-      const token = id_criptografado.hash;
+      var id_encrypted = await cryptography.sha512(id, salt);
+      const token = id_encrypted.hash;
 
 
       return response.json({id, token});
@@ -38,18 +38,25 @@ module.exports = {
     }
   },
 
+
+  
   async logout(request, response){
     const {id} = request.body;
     const token = request.headers.authorization;
+
+    if(!id || !token){
+      return response.status(403).json({status: "Logout imposível"});
+    }
 
     const authentication = await cryptography.authenticate(id, token);
     if(authentication){
       await connection('user').where('id', id).update({
         "salt_session": null
       });
+      return response.status(200).json({status: "Logout efetuado com sucesso"});
     }
 
-    return response.status(200);
+    return response.status(403).json({status: "Logout imposível"});
 
   }
 

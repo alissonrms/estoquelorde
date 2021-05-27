@@ -5,22 +5,22 @@ module.exports = {
   async create(request, response){
     const {username, password} = request.body;
 
-    const resultado = await connection('user')
+    const result = await connection('user')
     .where('username', username)
     .select('username')
     .first();
 
-    if(resultado){
-        return response.status(406).json({error: "User "+username+" has already been created"});
+    if(result){
+        return response.status(406).json({error: "Usuário "+username+" já está cadastrado"});
     }
 
     var salt = await cryptography.generateSalt();
     
-    var password_criptografada = await cryptography.sha512(password, salt);
-    password_criptografada = password_criptografada.hash;
+    var password_encrypted = await cryptography.sha512(password, salt);
+    password_encrypted = password_encrypted.hash;
 
     await connection('user').insert({
-        "password": password_criptografada,
+        "password": password_encrypted,
         "username": username,
         "salt": salt,
         "salt_session": null
