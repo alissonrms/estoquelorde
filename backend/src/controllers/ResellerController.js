@@ -63,7 +63,7 @@ module.exports = {
   },
 
   async list(request, response){
-    const {id_user} = request.body;
+    const {id_user} = request.query;
     const token = request.headers.authorization;
 
     if(!id_user || !token){
@@ -83,6 +83,38 @@ module.exports = {
     }else{
         return response.status(401).json({status: "Operação não permitida"});
     }
+  },
+
+  async update(request, response){
+    const {id_user, name, id_reseller} = request.body;
+    const token = request.headers.authorization;
+
+    if(!id_user || !token || !name || !id_reseller){
+        return response.status(400).json({status: "Atualização impossível"});
+    }
+    
+    const authentication = await cryptography.authenticate(id_user, token);
+
+    if(authentication){
+        const result = await connection('reseller')
+            .where('id', id_reseller)
+            .select('name')
+            .first();
+        if(result){
+            await connection('reseller')
+            .where("id", id_reseller)
+            .update({
+                "name": name
+            });
+            return response.status(200).json({status: name + " atualizado com sucesso"});
+        }else{
+            return response.status(406).json({status: "Revendedor não encontrado"});
+        }
+        
+    }else{
+        return response.status(401).json({status: "Atualização impossível"});
+    }
+
   }
 
 

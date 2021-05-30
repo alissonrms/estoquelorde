@@ -64,7 +64,7 @@ module.exports = {
   },
 
   async list(request, response){
-    const {id_user} = request.body;
+    const {id_user} = request.query;
     const token = request.headers.authorization;
 
     if(!id_user || !token){
@@ -77,13 +77,45 @@ module.exports = {
         const result = await connection("product")
             .where("id_user", id_user)
             .andWhere("activated", true)
-            .select("name", "id");
+            .select("name", "id", "stock");
         
         return response.json(result);
 
     }else{
         return response.status(401).json({status: "Operação não permitida"});
     }
+  },
+
+  async update(request, response){
+    const {id_user, name, id_product} = request.body;
+    const token = request.headers.authorization;
+
+    if(!id_user || !token || !name || !id_product){
+        return response.status(400).json({status: "Atualização impossível"});
+    }
+    
+    const authentication = await cryptography.authenticate(id_user, token);
+
+    if(authentication){
+        const result = await connection('product')
+            .where('id', id_product)
+            .select('name')
+            .first();
+        if(result){
+            await connection('product')
+            .where("id", id_product)
+            .update({
+                "name": name
+            });
+            return response.status(200).json({status: name + " atualizado com sucesso"});
+        }else{
+            return response.status(406).json({status: "Produto não encontrado"});
+        }
+        
+    }else{
+        return response.status(401).json({status: "Atualização impossível"});
+    }
+
   }
 
 

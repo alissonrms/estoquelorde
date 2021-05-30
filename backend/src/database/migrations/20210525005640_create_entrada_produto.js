@@ -4,6 +4,7 @@ exports.up = function(knex) {
         table.increments();      
         table.datetime('date_entry').notNullable();
         table.float('price_entry').notNullable();
+        table.integer('quantity').notNullable();
 
         table.string('id_product').notNullable();      
         table.foreign('id_product').references('id').inTable('product');
