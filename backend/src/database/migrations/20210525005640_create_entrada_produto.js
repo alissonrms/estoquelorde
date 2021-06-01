@@ -2,7 +2,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('entry_product', function (table) {
         table.increments();      
-        table.datetime('date_entry').notNullable();
+        table.datetime('date').notNullable();
         table.float('price_entry').notNullable();
         table.integer('quantity').notNullable();
 

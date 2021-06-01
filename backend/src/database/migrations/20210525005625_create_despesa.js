@@ -2,7 +2,8 @@
 exports.up = function(knex) {
     return knex.schema.createTable('expense', function (table) {
         table.increments();      
-        table.datetime('date_expense').notNullable();
+        table.datetime('date').notNullable();
+        
         table.float('price_expense').notNullable();
         table.text('description').notNullable();
 

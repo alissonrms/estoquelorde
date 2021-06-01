@@ -37,7 +37,7 @@ module.exports = {
             const stock = parseInt(result.stock) + parseInt(stock_product);
 
             await connection('entry_product').insert({
-                "date_entry": full_date,
+                "date": full_date,
                 "price_entry": price_entry,
                 "id_product": id_product,
                 "id_user": id_user,
@@ -119,7 +119,7 @@ module.exports = {
             .join("product", "entry_product.id_product", "=", "product.id")
             .where("entry_product.id_user", id_user)
             .select("product.name", "entry_product.id",
-            "entry_product.date_entry", "entry_product.price_entry", "entry_product.quantity");
+            "entry_product.date", "entry_product.price_entry", "entry_product.quantity");
         
         return response.json(result);
 

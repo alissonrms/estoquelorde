@@ -27,12 +27,13 @@ module.exports = {
     if(authentication){
         const result = await connection('reseller')
         .where('id', id_reseller)
+        .andWhere('id_user', id_user)
         .select('id')
         .first();
 
         if(result){
             await connection('expense').insert({
-                'date_expense': full_date,
+                'date': full_date,
                 'price_expense': price_expense,
                 'description': description,
                 'id_reseller': id_reseller,
@@ -89,7 +90,7 @@ module.exports = {
         const result = await connection("expense")
             .join("reseller", "expense.id_reseller", "=", "reseller.id")
             .where("expense.id_user", id_user)
-            .select("expense.date_expense", "expense.price_expense", 
+            .select("expense.date", "expense.price_expense", 
             "expense.description", "reseller.name", "expense.id");
         
         return response.json(result);

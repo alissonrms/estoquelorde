@@ -2,7 +2,8 @@
 exports.up = function(knex) {
     return knex.schema.createTable('selling', function (table) {
         table.increments();      
-        table.datetime('date_selling').notNullable();
+        table.datetime('date').notNullable();
+        
         
         table.string('id_user').notNullable();      
         table.foreign('id_user').references('id').inTable('user');
