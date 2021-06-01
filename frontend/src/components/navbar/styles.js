@@ -22,5 +22,5 @@ export const Item = styled(Link)`
   align-items: center;
   justify-content: center;
   color: white;
-  background-color: ${props => props.active ? Colors.red : ''};
+  background-color: ${props => props.active ? Colors.lightBlue : ''};
 `;

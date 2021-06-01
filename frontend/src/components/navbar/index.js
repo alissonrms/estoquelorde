@@ -17,13 +17,13 @@ function Navbar() {
       <Item to="/extrato" active={location.pathname === "/extrato"}>
         <FontAwesomeIcon style={{marginBottom: 5}} icon={faDollarSign} size="1x" />
       </Item>
-      <Item to="/estoque" active={location.pathname === "/extrato"}>
+      <Item to="/estoque" active={location.pathname === "/estoque"}>
         <FontAwesomeIcon style={{marginBottom: 5}} icon={faBoxes} size="1x" />
       </Item>
-      <Item to="/representantes" active={location.pathname === "/extrato"}>
+      <Item to="/representantes" active={location.pathname === "/representantes"}>
         <FontAwesomeIcon style={{marginBottom: 5}} icon={faUserAlt} size="1x" />
       </Item>
-      <Item to="/despesas" active={location.pathname === "/extrato"}>
+      <Item to="/despesas" active={location.pathname === "/despesas"}>
         <FontAwesomeIcon style={{marginBottom: 5}} icon={faSortAmountDown} size="1x" />
       </Item>
     </Container>
