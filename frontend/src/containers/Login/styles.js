@@ -1,22 +1,8 @@
 import styled from 'styled-components';
 
+import Colors from '../../constants/Colors'; 
+
 import boxLogo from '../../assets/box.png';
-
-const lightBlue = '#00A6ED';
-const darkBlue = '#0D2C54';
-
-export const Container = styled.div`
-  width: 100%;
-  height: 100vh;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 150px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-image: linear-gradient(${lightBlue}, ${darkBlue});
-`;
 
 export const BoxLogo = styled.img.attrs({
   src: `${boxLogo}`,
@@ -57,13 +43,12 @@ export const Button = styled.button`
   outline: none;
   border: none;
   box-shadow: none;
-  background-color: ${darkBlue};
+  background-color: ${Colors.darkBlue};
   color: white;
   font-weight: 600;
   -webkit-tap-highlight-color: transparent;
   &:active{
     background-color: transparent;
-    border: 1px solid white;
     transition: 150ms;
   }
 `
