@@ -5,8 +5,8 @@ const ResellerController = require('./controllers/ResellerController');
 const ProductController = require('./controllers/ProductController');
 const EntryProductController = require('./controllers/EntryProductController');
 const ExpenseController = require('./controllers/ExpenseController');
-const SellingController = require('./controllers/SellingController');
-const SellingProductController = require('./controllers/SellingProductController');
+const saleController = require('./controllers/saleController');
+const saleProductController = require('./controllers/saleProductController');
 const StatementController = require('./controllers/StatementController');
 
 const Apagar = require('./controllers/Apagar');
@@ -32,22 +32,19 @@ routes.put('/product', ProductController.update);
 
 routes.post('/entryproduct', EntryProductController.create);
 routes.delete('/entryproduct', EntryProductController.delete);
-routes.get('/entryproduct', EntryProductController.list);
 routes.put('/entryproduct', EntryProductController.update);
 
 routes.post('/expense', ExpenseController.create);
 routes.delete('/expense', ExpenseController.delete);
-routes.get('/expense', ExpenseController.list);
 routes.put('/expense', ExpenseController.update);
 
-routes.post('/selling', SellingController.create);
-routes.delete('/selling', SellingController.delete);
-routes.get('/selling', SellingController.list);
-routes.put('/selling', SellingController.update);
+routes.post('/sale', saleController.create);
+routes.delete('/sale', saleController.delete);
+routes.put('/sale', saleController.update);
 
-routes.put('/sellingproduct', SellingProductController.update);
+routes.put('/saleproduct', saleProductController.update);
 
-routes.get('/statement-total', StatementController.totalStatement);
+routes.get('/statement-values', StatementController.values);
 routes.get('/statement-list', StatementController.list);
 
 module.exports = routes;

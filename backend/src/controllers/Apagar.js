@@ -23,19 +23,19 @@ module.exports = {
       entry_product[key].type = "entry";
     }
 
-    var selling_product = await connection("selling_product")
-    .join("selling", "selling.id", "=", "selling_product.id_selling")
-    .join('product', 'product.id', '=', 'selling_product.id_product')
-    .join('reseller', 'reseller.id', '=', 'selling.id_reseller')
-    .select('selling.id', 'selling.date', 'reseller.name',
-      'product.name', 'selling_product.quantity', 'selling_product.price',
-      'selling_product.id as id_selling_product', 'selling_product.id_product as id_product');
+    var sale_product = await connection("sale_product")
+    .join("sale", "sale.id", "=", "sale_product.id_sale")
+    .join('product', 'product.id', '=', 'sale_product.id_product')
+    .join('reseller', 'reseller.id', '=', 'sale.id_reseller')
+    .select('sale.id', 'sale.date', 'reseller.name',
+      'product.name', 'sale_product.quantity', 'sale_product.price',
+      'sale_product.id as id_sale_product', 'sale_product.id_product as id_product');
     
-      for(const key in selling_product){
-        selling_product[key].type = "selling";
+      for(const key in sale_product){
+        sale_product[key].type = "sale";
       }
 
-    const result = expense.concat(entry_product).concat(selling_product);
+    const result = expense.concat(entry_product).concat(sale_product);
 
     function orderDate(a, b) {
       if (a.date > b.date) {

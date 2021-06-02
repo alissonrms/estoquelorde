@@ -1,5 +1,6 @@
 const connection = require('../database/connection');
-const cryptography = require('./cryptography');
+const cryptography = require('./utilities/cryptography');
+const functions = require('./utilities/functions');
 
 module.exports = {
   async create(request, response){
@@ -13,15 +14,8 @@ module.exports = {
     }
 
     const date = new Date();
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
 
-    const full_date = year + "-" + month + "-" + day + " " 
-    + hours + ":" + minutes + ":" + seconds;
+    const full_date = functions.formatDate(date);
     
     const authentication = await cryptography.authenticate(id_user, token);
 
@@ -102,30 +96,6 @@ module.exports = {
         return response.status(401).json({status: "Operação não permitida"});
     }
 
-  },
-
-  async list(request, response){
-    const {id_user} = request.query;
-    const token = request.headers.authorization;
-
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
-    }
-    
-    const authentication = await cryptography.authenticate(id_user, token);
-
-    if(authentication){
-        const result = await connection("entry_product")
-            .join("product", "entry_product.id_product", "=", "product.id")
-            .where("entry_product.id_user", id_user)
-            .select("product.name", "entry_product.id",
-            "entry_product.date", "entry_product.price_entry", "entry_product.quantity");
-        
-        return response.json(result);
-
-    }else{
-        return response.status(401).json({status: "Operação não permitida"});
-    }
   },
 
   async update(request, response){

@@ -1,5 +1,5 @@
 const connection = require('../database/connection');
-const cryptography = require('./cryptography');
+const cryptography = require('./utilities/cryptography');
 
 module.exports = {
   async login(request, response){

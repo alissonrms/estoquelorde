@@ -1,5 +1,6 @@
 const connection = require('../database/connection');
-const cryptography = require('./cryptography');
+const cryptography = require('./utilities/cryptography');
+const functions = require('./utilities/functions');
 
 
 module.exports = {
@@ -14,9 +15,9 @@ module.exports = {
     }
     for (const key in products) {
         const query = await connection('product')
-        .where('id', products[key].id_product)
-        .select('stock')
-        .first();
+            .where('id', products[key].id_product)
+            .select('stock')
+            .first();
             
         if(!(products[key]).quantity || !(products[key]).price || !(products[key]).id_product
             || !((products[key]).quantity > 0) || !((products[key]).price > 0)
@@ -29,37 +30,30 @@ module.exports = {
     }
 
     const date = new Date();
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
 
-    const full_date = year + "-" + month + "-" + day + " " 
-    + hours + ":" + minutes + ":" + seconds;
+    const full_date = functions.formatDate(date);
     
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
-        await connection('selling').insert({
+        await connection('sale').insert({
             'date': full_date,
             'id_user': id_user,
             'id_reseller': id_reseller
         });
-        const result = await connection('selling')
+        const result = await connection('sale')
         .where('id_user', id_user)
         .andWhere('date', full_date)
         .select('id')
         .first();
         
         for (const key in products) {     
-            await connection('selling_product').insert({
+            await connection('sale_product').insert({
                 'quantity': products[key].quantity,
                 'price': products[key].price,
                 'id_user': id_user,
                 'id_product': products[key].id_product,
-                'id_selling': result.id
+                'id_sale': result.id
             });
             const queryStock = await connection('product')
                 .where('id', products[key].id_product)
@@ -85,21 +79,21 @@ module.exports = {
   },
 
   async delete(request, response){
-    const {id_user, id_selling, } = request.body;
+    const {id_user, id_sale, } = request.body;
     const token = request.headers.authorization;
 
-    if(!id_user || !token || !id_selling){
+    if(!id_user || !token || !id_sale){
         return response.status(401).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
-        const result = await connection('selling')
-            .join('selling_product', 'selling.id', '=', 'selling_product.id_selling')
-            .where('selling.id_user', id_user)
-            .andWhere('selling.id', id_selling)
-            .select('selling_product.id_product', 'selling_product.quantity', 'selling_product.id');
+        const result = await connection('sale')
+            .join('sale_product', 'sale.id', '=', 'sale_product.id_sale')
+            .where('sale.id_user', id_user)
+            .andWhere('sale.id', id_sale)
+            .select('sale_product.id_product', 'sale_product.quantity', 'sale_product.id');
         for(const key in result){
             const resultB = await connection('product')
                 .where('id', result[key].id_product)
@@ -111,14 +105,14 @@ module.exports = {
                 .update({
                     'stock': stock
                 });
-            await connection("selling_product")
+            await connection("sale_product")
                 .where("id", result[key].id)
                 .andWhere('id_user', id_user)
                 .delete();
         }
 
-        await connection("selling")
-            .where("id", id_selling)
+        await connection("sale")
+            .where("id", id_sale)
             .andWhere('id_user', id_user)
             .delete();
 
@@ -130,38 +124,11 @@ module.exports = {
 
   },
 
-  async list(request, response){
-    const {id_user} = request.query;
-    const token = request.headers.authorization;
-
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
-    }
-    
-    const authentication = await cryptography.authenticate(id_user, token);
-
-    if(authentication){
-        const result = await connection("selling_product")
-            .join("selling", "selling.id", "=", "selling_product.id_selling")
-            .join('product', 'product.id', '=', 'selling_product.id_product')
-            .join('reseller', 'reseller.id', '=', 'selling.id_reseller')
-            .where("selling.id_user", id_user)
-            .select('selling.id', 'selling.date', 'reseller.name',
-             'product.name', 'selling_product.quantity', 'selling_product.price',
-              'selling_product.id as id_selling_product', 'selling_product.id_product as id_product');
-        
-        return response.json(result);
-
-    }else{
-        return response.status(401).json({status: "Operação não permitida"});
-    }
-  },
-
   async update(request, response){
-    const {id_user, id_reseller, id_selling} = request.body;
+    const {id_user, id_reseller, id_sale} = request.body;
     const token = request.headers.authorization;
     
-    if(!id_user || !token || !id_selling
+    if(!id_user || !token || !id_sale
         || !id_reseller){
         return response.status(400).json({status: "Atualização impossível"});
     }
@@ -177,9 +144,9 @@ module.exports = {
         if(!reseller){
             return response.status(400).json({status: "Atualização impossível"});
         }
-        await connection('selling')
+        await connection('sale')
             .where('id_user', id_user)
-            .andWhere('id', id_selling)
+            .andWhere('id', id_sale)
             .update({
                 'id_reseller': id_reseller,
             });

@@ -1,6 +1,6 @@
 
 exports.up = function(knex) {
-    return knex.schema.createTable('selling', function (table) {
+    return knex.schema.createTable('sale',function (table) {
         table.increments();      
         table.datetime('date').notNullable();
         
