@@ -13,8 +13,6 @@ module.exports = {
     }
 
     const date = new Date();
-
-    const full_date = functions.formatDate(date);
     
     const authentication = await cryptography.authenticate(id_user, token);
 
@@ -27,7 +25,7 @@ module.exports = {
 
         if(result){
             await connection('expense').insert({
-                'date': full_date,
+                'date': date,
                 'price_expense': price_expense,
                 'description': description,
                 'id_reseller': id_reseller,
@@ -84,16 +82,19 @@ module.exports = {
     if(authentication){
         const resultA = await connection('reseller')
             .where('id', id_reseller)
+            .andWhere('id_user', id_user)
             .select('id')
             .first();
         const resultB = await connection('expense')
             .where('id', id_expense)
+            .andWhere('id_user', id_user)
             .select('id')
             .first();
 
         if(resultA && resultB){
             await connection('expense')
             .where("id", id_expense)
+            .andWhere('id_user', id_user)
             .update({
                 'price_expense': price_expense,
                 'description': description,

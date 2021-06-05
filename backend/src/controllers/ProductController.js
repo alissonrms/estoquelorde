@@ -16,11 +16,19 @@ module.exports = {
         const result = await connection('product')
             .where('name', name)
             .andWhere('id_user', id_user)
-            .select('name')
+            .select('name', 'activated', 'id')
             .first();
-        if(result){
+        if(result && result.activated){
             return response.status(406).json({status: "Produto"+name+" já está cadastrado"});
         }else{
+            if(result && !result.activated){
+                await connection('product')
+                    .where("id", result.id)
+                    .update({
+                        "activated": true
+                    });
+                return response.status(200).json({status: name + " cadastrado com sucesso"});
+            }
             await connection('product').insert({
                 "name": name,
                 "activated": true,
@@ -77,6 +85,7 @@ module.exports = {
         const result = await connection("product")
             .where("id_user", id_user)
             .andWhere("activated", true)
+            .andWhere('id_user', id_user)
             .select("name", "id", "stock");
         
         return response.json(result);
@@ -99,6 +108,7 @@ module.exports = {
     if(authentication){
         const result = await connection('product')
             .where('id', id_product)
+            .andWhere('id_user', id_user)
             .select('name')
             .first();
         if(result){

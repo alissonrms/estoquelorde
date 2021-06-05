@@ -16,11 +16,19 @@ module.exports = {
         const result = await connection('reseller')
             .where('name', reseller_name)
             .andWhere('id_user', id_user)
-            .select('name')
+            .select('name', 'id', 'activated')
             .first();
-        if(result){
+        if(result && result.activated){
             return response.status(406).json({status: "Representante "+reseller_name+" já está cadastrado"});
         }else{
+            if(result && !result.activated){
+                await connection('reseller')
+                    .where("id", result.id)
+                    .update({
+                        "activated": true
+                    });
+                return response.status(200).json({status: name + " cadastrado com sucesso"});
+            }
             await connection('reseller').insert({
                 "name": reseller_name,
                 "activated": true,
@@ -76,6 +84,7 @@ module.exports = {
         const result = await connection("reseller")
             .where("id_user", id_user)
             .andWhere("activated", true)
+            .andWhere('id_user', id_user)
             .select("name", "id");
         
         return response.json(result);

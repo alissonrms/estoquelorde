@@ -14,8 +14,6 @@ module.exports = {
     }
 
     const date = new Date();
-
-    const full_date = functions.formatDate(date);
     
     const authentication = await cryptography.authenticate(id_user, token);
 
@@ -31,7 +29,7 @@ module.exports = {
             const stock = parseInt(result.stock) + parseInt(stock_product);
 
             await connection('entry_product').insert({
-                "date": full_date,
+                "date": date,
                 "price_entry": price_entry,
                 "id_product": id_product,
                 "id_user": id_user,
@@ -69,10 +67,12 @@ module.exports = {
     if(authentication){
         const resultA = await connection('entry_product')
             .where('id', entry_product_id)
+            .andWhere('id_user', id_user)
             .select('quantity', 'id_product')
             .first();
         const resultB = await connection('product')
             .where('id', resultA.id_product)
+            .andWhere('id_user', id_user)
             .select('stock')
             .first();
         const stock = parseInt(resultB.stock) - parseInt(resultA.quantity);
@@ -81,6 +81,7 @@ module.exports = {
         }
         await connection('product')
             .where("id", resultA.id_product)
+            .andWhere('id_user', id_user)
             .update({
                 "stock": stock
             });
@@ -114,14 +115,17 @@ module.exports = {
     if(authentication){
         const resultA = await connection('entry_product')
             .where('id', id_entry_product)
+            .andWhere('id_user', id_user)
             .select('quantity', 'id_product')
             .first();
         const resultB = await connection('product')
             .where('id', id_product)
+            .andWhere('id_user', id_user)
             .select('stock', 'id')
             .first();
         const resultC = await connection('product')
             .where('id', resultA.id_product)
+            .andWhere('id_user', id_user)
             .select('stock', 'id')
             .first();
 

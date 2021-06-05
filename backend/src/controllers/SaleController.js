@@ -16,6 +16,7 @@ module.exports = {
     for (const key in products) {
         const query = await connection('product')
             .where('id', products[key].id_product)
+            .andWhere('id_user', id_user)
             .select('stock')
             .first();
             
@@ -30,20 +31,18 @@ module.exports = {
     }
 
     const date = new Date();
-
-    const full_date = functions.formatDate(date);
     
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
         await connection('sale').insert({
-            'date': full_date,
+            'date': date,
             'id_user': id_user,
             'id_reseller': id_reseller
         });
         const result = await connection('sale')
         .where('id_user', id_user)
-        .andWhere('date', full_date)
+        .andWhere('date', date)
         .select('id')
         .first();
         

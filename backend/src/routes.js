@@ -8,6 +8,7 @@ const ExpenseController = require('./controllers/ExpenseController');
 const saleController = require('./controllers/saleController');
 const saleProductController = require('./controllers/saleProductController');
 const StatementController = require('./controllers/StatementController');
+const ReportController = require('./controllers/ReportController');
 
 const Apagar = require('./controllers/Apagar');
 
@@ -46,5 +47,9 @@ routes.put('/saleproduct', saleProductController.update);
 
 routes.get('/statement-values', StatementController.values);
 routes.get('/statement-list', StatementController.list);
+
+routes.get('/report-product', ReportController.product);
+routes.get('/report-reseller', ReportController.reseller);
+routes.get('/report-statement', ReportController.list);
 
 module.exports = routes;
