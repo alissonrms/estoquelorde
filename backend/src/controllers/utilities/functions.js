@@ -2,21 +2,46 @@ const connection = require('../../database/connection');
 const cryptography = require('./cryptography');
 
 module.exports = {
-    formatDate(today){
-        var year = today.getFullYear();
-        var month = today.getMonth() + 1;
-        var day = today.getDate();
-        var hours = today.getHours();
-        var minutes = today.getMinutes();
-        var seconds = today.getSeconds();
+    async calcResellerValues(sale, datepast, today){
+        var sales = 0;
+        var commission = 0;
+        var profit = 0;
+        for(const key in sale){
+            sales += 1;
+            const com = sale[key].price * sale[key].commission / 100;
+            commission += com;
+            if(sale[key].paid == true && sale[key].pay_date >= datepast && sale[key].pay_date <= today){
+                profit += sale[key].price - com;
+            }
+        }
 
-        return year + "-" + month + "-" + day + " " 
-        + hours + ":" + minutes + ":" + seconds;
+        return {sales,commission,profit};
+    },
+
+    async verifyProducts(products, id_user){
+        for (const key in products) {
+            const query = await connection('product')
+                .where('id', products[key].id_product)
+                .andWhere('id_user', id_user)
+                .select('stock')
+                .first();
+                
+            if(!(products[key]).quantity || !(products[key]).id_product
+                || !((products[key]).quantity > 0)
+                || Math.floor((products[key]).quantity) != (products[key]).quantity
+                || (products[key]).quantity > query.stock
+                ){
+                return false;
+            }
+            
+        }
+        return true;
     },
 
     async queryListStatement(request, response, offset, limit){
-        const {id_user, datepast, today} = request.query;
+        const { datepast, today} = request.query;
         const token = request.headers.authorization;
+        const  id_user = request.headers.id_user;
 
         if(!id_user || !token || !datepast || !today
         || !(datepast > 0)
@@ -45,14 +70,14 @@ module.exports = {
                     connection('sale_product')
                     .join('sale', 'sale.id', '=', 'sale_product.id_sale')
                     .join('product', 'product.id', '=', 'sale_product.id_product')
-                    .where('sale_product.id_user', id_user)
+                    .where('sale.id_user', id_user)
                     .whereBetween('sale.date', [datepast, today])
-                    .select('sale_product.price',
+                    .select('sale.price',
                     'sale_product.quantity',
                     'product.name',
-                    'sale.date',
+                    'sale.pay_date',
                     'sale.id',
-                    'sale_product.id',
+                    'sale.commission',
                     'sale_product.type as type')
                 ])
                 .unionAll([
@@ -84,7 +109,7 @@ module.exports = {
                     "name": "c3",
                     "date": "date",
                     "id_sale": "c4",
-                    "id_sale_product": "c5"
+                    "commission": "c5"
                 }
                 const entry = {
                     "price": "c1",
@@ -100,5 +125,4 @@ module.exports = {
             return response.status(401).json({status: "Operação não permitida"});
         }
     }
-
 }

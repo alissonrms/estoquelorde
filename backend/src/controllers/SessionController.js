@@ -41,16 +41,16 @@ module.exports = {
 
   
   async logout(request, response){
-    const {id} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
-    if(!id || !token){
+    if(!id_user || !token){
       return response.status(403).json({status: "Logout imposível"});
     }
 
     const authentication = await cryptography.authenticate(id, token);
     if(authentication){
-      await connection('user').where('id', id).update({
+      await connection('user').where('id', id_user).update({
         "salt_session": null
       });
       return response.status(200).json({status: "Logout efetuado com sucesso"});

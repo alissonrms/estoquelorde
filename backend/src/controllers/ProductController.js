@@ -3,8 +3,9 @@ const cryptography = require('./utilities/cryptography');
 
 module.exports = {
   async create(request, response){
-    const {id_user, name} = request.body;
+    const { name} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !name){
         return response.status(400).json({status: "Cadastro impossível"});
@@ -46,8 +47,9 @@ module.exports = {
   },
 
   async delete(request, response){
-    const {id_user, product_id} = request.body;
+    const { product_id} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !product_id){
         return response.status(401).json({status: "Operação não permitida"});
@@ -72,8 +74,8 @@ module.exports = {
   },
 
   async list(request, response){
-    const {id_user} = request.query;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token){
         return response.status(401).json({status: "Operação não permitida"});
@@ -96,8 +98,9 @@ module.exports = {
   },
 
   async update(request, response){
-    const {id_user, name, id_product} = request.body;
+    const { name, id_product} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !name || !id_product){
         return response.status(400).json({status: "Atualização impossível"});

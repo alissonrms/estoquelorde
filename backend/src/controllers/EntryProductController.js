@@ -1,11 +1,11 @@
 const connection = require('../database/connection');
 const cryptography = require('./utilities/cryptography');
-const functions = require('./utilities/functions');
 
 module.exports = {
   async create(request, response){
-    const {id_user, id_product, price_entry, stock_product} = request.body;
+    const { id_product, price_entry, stock_product} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
     
     if(!id_user || !token || !id_product 
         || !(price_entry > 0) || !(stock_product > 0)
@@ -55,8 +55,9 @@ module.exports = {
   },
 
   async delete(request, response){
-    const {id_user, entry_product_id, } = request.body;
+    const { entry_product_id, } = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !entry_product_id){
         return response.status(401).json({status: "Operação não permitida"});
@@ -100,8 +101,9 @@ module.exports = {
   },
 
   async update(request, response){
-    const {id_user, id_product, price_entry, stock_product, id_entry_product} = request.body;
+    const { id_product, price_entry, stock_product, id_entry_product} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !id_product 
         || !(price_entry > 0) || !(stock_product > 0)

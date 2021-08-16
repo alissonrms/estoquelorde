@@ -4,8 +4,9 @@ const functions = require('./utilities/functions');
 
 module.exports = {
   async create(request, response){
-    const {id_user, price_expense, description, id_reseller} = request.body;
+    const { price_expense, description, id_reseller} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
     
     if(!id_user || !token || !price_expense 
         || !(price_expense > 0) || !description || !id_reseller){
@@ -45,8 +46,9 @@ module.exports = {
   },
 
   async delete(request, response){
-    const {id_user, expense_id} = request.body;
+    const { expense_id} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !expense_id){
         return response.status(401).json({status: "Operação não permitida"});
@@ -69,8 +71,9 @@ module.exports = {
   },
 
   async update(request, response){
-    const {id_user, price_expense, description, id_reseller, id_expense} = request.body;
+    const {price_expense, description, id_reseller, id_expense} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
     
     if(!id_user || !token || !price_expense 
         || !(price_expense > 0) || !description || !id_reseller || !id_expense){

@@ -3,6 +3,7 @@ exports.up = function(knex) {
     return knex.schema.createTable('sale',function (table) {
         table.increments();      
         table.datetime('date').notNullable();
+        table.datetime('pay_date').notNullable();
         
         
         table.string('id_user').notNullable();      

@@ -4,12 +4,12 @@ const cryptography = require('./utilities/cryptography');
 
 module.exports = {
   async update(request, response){
-    const {id_user, id_sale_products, price, quantity, id_product} = request.body;
+    const { id_sale_products, quantity} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
     
     if(!id_user || !token || !id_sale_products 
-        || !price || !quantity || !id_product
-        || !(price > 0) || !(quantity > 0)
+        || !quantity || !(quantity > 0)
         || Math.floor(quantity) != quantity){
         return response.status(400).json({status: "Atualização impossível"});
     }
@@ -57,7 +57,6 @@ module.exports = {
             .where('id_user', id_user)
             .andWhere('id', id_sale_products)
             .update({
-                'price': price,
                 'quantity': quantity,
                 'id_product': id_product
                 

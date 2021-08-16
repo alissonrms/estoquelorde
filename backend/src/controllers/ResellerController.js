@@ -3,8 +3,9 @@ const cryptography = require('./utilities/cryptography');
 
 module.exports = {
   async create(request, response){
-    const {id_user, reseller_name} = request.body;
+    const { reseller_name} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !reseller_name){
         return response.status(400).json({status: "Cadastro impossível"});
@@ -45,8 +46,9 @@ module.exports = {
   },
 
   async delete(request, response){
-    const {id_user, reseller_id} = request.body;
+    const { reseller_id} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !reseller_id){
         return response.status(401).json({status: "Operação não permitida"});
@@ -71,8 +73,8 @@ module.exports = {
   },
 
   async list(request, response){
-    const {id_user} = request.query;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token){
         return response.status(401).json({status: "Operação não permitida"});
@@ -95,8 +97,9 @@ module.exports = {
   },
 
   async update(request, response){
-    const {id_user, name, id_reseller} = request.body;
+    const { name, id_reseller} = request.body;
     const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !name || !id_reseller){
         return response.status(400).json({status: "Atualização impossível"});

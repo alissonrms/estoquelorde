@@ -11,6 +11,7 @@ const StatementController = require('./controllers/StatementController');
 const ReportController = require('./controllers/ReportController');
 
 const Apagar = require('./controllers/Apagar');
+const installmentController = require('./controllers/installmentController');
 
 const routes = express.Router();
 
@@ -42,6 +43,9 @@ routes.put('/expense', ExpenseController.update);
 routes.post('/sale', saleController.create);
 routes.delete('/sale', saleController.delete);
 routes.put('/sale', saleController.update);
+
+routes.get('/installment', installmentController.list);
+routes.delete('/installment', installmentController.delete);
 
 routes.put('/saleproduct', saleProductController.update);
 
