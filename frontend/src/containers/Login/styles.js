@@ -51,4 +51,7 @@ export const Button = styled.button`
     background-color: transparent;
     transition: 150ms;
   }
+  &:disabled{
+    opacity: 0.7;
+  }
 `

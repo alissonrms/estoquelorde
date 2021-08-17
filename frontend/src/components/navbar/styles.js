@@ -10,8 +10,6 @@ export const Container = styled.div`
   width: 100%;
   height: 60px;
   background-color: ${Colors.darkBlue};
-  opacity: 0.8;
-
   display: grid;
   grid-template-columns: auto auto auto auto auto;
 `;
@@ -22,5 +20,5 @@ export const Item = styled(Link)`
   align-items: center;
   justify-content: center;
   color: white;
-  background-color: ${props => props.active ? Colors.lightBlue : ''};
+  background-color: ${props => props.currentactive === 'true' ? Colors.lightBlue : Colors.darkBlue };
 `;

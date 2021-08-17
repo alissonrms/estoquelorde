@@ -15,7 +15,10 @@ section{
 
 body {
   font: 400 14px Roboto, sans-serif;
-  background: #f0f0f5;
+  background-image: linear-gradient(#00A6ED, #0D2C54);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
   -webkit-font-smoothing: antialiased;
 }
 

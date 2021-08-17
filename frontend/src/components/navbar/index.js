@@ -4,27 +4,27 @@ import { Container, Item } from './styles';
 import { useLocation } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faDollarSign, faBoxes, faUserAlt, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faScroll, faCoins, faDollyFlatbed, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
 
 function Navbar() {
   let location = useLocation();
 
   return (
     <Container>
-      <Item to="/faturamento" active={location.pathname === "/faturamento"}>
-        <FontAwesomeIcon style={{marginBottom: 5}} icon={faChartLine} size="1x" />
+      <Item to="/" currentactive={location.pathname === "/" ? 'true' : 'false'}>
+        <FontAwesomeIcon style={{marginBottom: 5}} icon={faHome} size="1x" />
       </Item>
-      <Item to="/extrato" active={location.pathname === "/extrato"}>
-        <FontAwesomeIcon style={{marginBottom: 5}} icon={faDollarSign} size="1x" />
+      <Item to="/extrato" currentactive={location.pathname === "/extrato" ? 'true' : 'false'}>
+        <FontAwesomeIcon style={{marginBottom: 5}} icon={faScroll} size="1x" />
       </Item>
-      <Item to="/estoque" active={location.pathname === "/estoque"}>
-        <FontAwesomeIcon style={{marginBottom: 5}} icon={faBoxes} size="1x" />
+      <Item to="/nova/venda" currentactive={location.pathname === "/nova/venda" ? 'true' : 'false'}>
+        <FontAwesomeIcon style={{marginBottom: 5}} icon={faCoins} size="1x" />
       </Item>
-      <Item to="/representantes" active={location.pathname === "/representantes"}>
-        <FontAwesomeIcon style={{marginBottom: 5}} icon={faUserAlt} size="1x" />
-      </Item>
-      <Item to="/despesas" active={location.pathname === "/despesas"}>
+      <Item to="/nova/despesa" currentactive={location.pathname === "/nova/despesa" ? 'true' : 'false'}>
         <FontAwesomeIcon style={{marginBottom: 5}} icon={faSortAmountDown} size="1x" />
+      </Item>
+      <Item to="/nova/entrada-produto" currentactive={location.pathname === "/nova/entrada-produto" ? 'true' : 'false'}>
+        <FontAwesomeIcon style={{marginBottom: 5}} icon={faDollyFlatbed} size="1x" />
       </Item>
     </Container>
   );

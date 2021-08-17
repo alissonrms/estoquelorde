@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import api from '../../services/api';
+import { useAuth } from '../../contexts/auth';
 
 import { DefaultContainer } from '../../components/DefaultContainer';
 import { BoxLogo, Username, Password, Button } from './styles';
 
 function Login() {
-  const history = useHistory();
+  const { signIn } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,16 +30,11 @@ function Login() {
   async function handleLogin(event) {
     event.preventDefault();
     setIsSubmitting(true);
-
-    try {
-      const response = await api.post('session', { username, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('id', response.data.id);
-      history.push('/faturamento');
-    } catch (err) {
+    const signed = await signIn(username, password);
+    if(!signed){
       showLoginError();
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   }
 
   return (
@@ -52,6 +46,7 @@ function Login() {
       <Button onClick={handleLogin} disabled={isSubmitting || username==="" || password===""}>ACESSAR</Button>
 
     </DefaultContainer>
+
   )
 }
 

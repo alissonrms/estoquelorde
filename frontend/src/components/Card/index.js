@@ -24,7 +24,7 @@ export const HeaderText = styled.p`
   padding: 0px;
   font-size: small;
   font-weight: 400;
-  color: ${Colors.gray};
+  color: ${props => props.color || Colors.gray};
 `;
 
 export const CardContainer = styled.div`
@@ -38,6 +38,9 @@ export const ItemsContainer = styled.div`
 `;
 
 export const CardItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   color: ${props => props.color || Colors.gray};
   margin-top: ${props => props.marginTop ? "15px" : "0px"};
 `;
