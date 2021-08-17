@@ -24,12 +24,7 @@ module.exports = {
         const entry_product = await connection('entry_product')
             .whereBetween('date', [datepast, today])
             .andWhere('id_user', id_user)
-            .select('price_entry', 'quantity');
-
-        var total_entry_product = 0;
-        for(const key in entry_product){
-            total_entry_product += entry_product[key].price_entry;
-        }
+            .sum('price_entry as sum');
 
         const sale = await connection("sale")
         .whereBetween('date', [datepast, today])
@@ -41,7 +36,7 @@ module.exports = {
 
         return response.json({
             "expense": expense[0].sum,
-            "entry_product": total_entry_product,
+            "entry_product": entry_product[0].sum,
             "sale": values.profit,
             "commission": values.commission,
             "pending:": values.pending
