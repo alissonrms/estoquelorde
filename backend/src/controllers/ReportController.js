@@ -18,20 +18,16 @@ module.exports = {
         var respost = [];
         const products = await connection('product').where('id_user', id_user).select('id', 'name');
         for(const key in products){
-            var units = 0;
-            const result = await connection('sale_product')
+            const sum = await connection('sale_product')
                 .join('sale', 'sale_product.id_sale', '=', 'sale.id')
                 .where('sale_product.id_product', products[key].id )
                 .andWhere('sale_product.id_user', id_user)
                 .whereBetween('sale.date', [datepast, today])
-                .select('sale_product.quantity');
-            for(const key in result){
-                units += result[key].quantity;
-            }
+                .sum('sale_product.quantity as sum');
             
             const product = {
                 "name": products[key].name,
-                "units": units
+                "units": sum[0].sum
             }
             respost = respost.concat(product);
         }
@@ -57,28 +53,25 @@ module.exports = {
         var respost = [];
         const resellers = await connection('reseller').where('id_user', id_user).select('id', 'name');
         for(const key in resellers){
-            var prejudice = 0;
             const expense = await connection('expense')
                 .where('id_reseller', resellers[key].id )
                 .andWhere('id_user', id_user)
                 .whereBetween('date', [datepast, today])
-                .select('price_expense');
+                .sum('price_expense as sum');
 
             const sale = await connection('sale')
                 .where('id_reseller', resellers[key].id)
                 .andWhere('id_user', id_user)
                 .whereBetween('date', [datepast, today])
                 .select('price', 'commission', 'paid', 'pay_date');
-            for(const key in expense){
-                prejudice += expense[key].price_expense;
-            }
+            
             const values = await functions.calcSaleValues(sale, datepast, today);
             
             const reseller = {
                 "name": resellers[key].name,
                 "sales": values.sales,
                 "profit": values.profit,
-                "prejudice": prejudice,
+                "prejudice": expense[0].sum,
                 "commission": values.commission
             };
             respost = respost.concat(reseller);
