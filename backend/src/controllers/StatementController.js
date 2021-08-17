@@ -37,7 +37,7 @@ module.exports = {
         .andWhere('id_user', id_user)
         .select('price', 'commission', 'paid', 'pay_date');
 
-        const values = await functions.calcResellerValues(sale, datepast, today);
+        const values = await functions.calcSaleValues(sale, datepast, today);
 
         return response.json({
             "expense": expense[0].sum,

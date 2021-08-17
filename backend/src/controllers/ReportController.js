@@ -72,7 +72,7 @@ module.exports = {
             for(const key in expense){
                 prejudice += expense[key].price_expense;
             }
-            const values = await functions.calcResellerValues(sale, datepast, today);
+            const values = await functions.calcSaleValues(sale, datepast, today);
             
             const reseller = {
                 "name": resellers[key].name,

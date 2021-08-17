@@ -2,7 +2,7 @@ const connection = require('../../database/connection');
 const cryptography = require('./cryptography');
 
 module.exports = {
-    async calcResellerValues(sale, datepast, today){
+    async calcSaleValues(sale, datepast, today){
         var sales = 0;
         var commission = 0;
         var profit = 0;
@@ -11,7 +11,7 @@ module.exports = {
             sales += 1;
             const com = sale[key].price * sale[key].commission / 100;
             commission += com;
-            if(sale[key].paid == true){
+            if(sale[key].paid == true && sale[key].pay_date >= datepast || sale[key].pay_date <= today){
                 profit += sale[key].price - com;
             }else{
                 pending += sale[key].price - com;
