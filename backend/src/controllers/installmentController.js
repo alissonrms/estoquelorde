@@ -1,7 +1,5 @@
 const connection = require('../database/connection');
-const { list } = require('./StatementController');
 const cryptography = require('./utilities/cryptography');
-const functions = require('./utilities/functions');
 
 module.exports = {
     async list(request, response){

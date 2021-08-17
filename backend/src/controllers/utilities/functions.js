@@ -15,21 +15,39 @@ module.exports = {
             }
         }
 
-        return {sales,commission,profit};
+        return {sales, profit, commission};
     },
 
-    async verifyProducts(products, id_user){
+    async verifyProducts(products, id_user, id_sale){
         for (const key in products) {
+            var oldStock = 0;
             const query = await connection('product')
                 .where('id', products[key].id_product)
                 .andWhere('id_user', id_user)
                 .select('stock')
                 .first();
-                
+            
+            if(!query){
+                return false
+            }
+
+            if(id_sale){
+                var sale = await connection('sale_product')
+                    .join('sale', 'sale.id', '=', 'sale_product.id_sale')
+                    .where('sale.id_user', id_user)
+                    .andWhere('sale.id', id_sale)
+                    .andWhere('sale_product.id_product', products[key].id_product)
+                    .select('sale_product.quantity');
+
+                for( const i in sale){
+                    oldStock += sale[i].quantity;
+                }
+            }
+
             if(!(products[key]).quantity || !(products[key]).id_product
                 || !((products[key]).quantity > 0)
                 || Math.floor((products[key]).quantity) != (products[key]).quantity
-                || (products[key]).quantity > query.stock
+                || products[key].quantity > query.stock + oldStock
                 ){
                 return false;
             }

@@ -57,10 +57,7 @@ module.exports = {
         var respost = [];
         const resellers = await connection('reseller').where('id_user', id_user).select('id', 'name');
         for(const key in resellers){
-            var profit = 0;
-            var sales = 0;
             var prejudice = 0;
-            var commission = 0;
             const expense = await connection('expense')
                 .where('id_reseller', resellers[key].id )
                 .andWhere('id_user', id_user)
@@ -71,7 +68,7 @@ module.exports = {
                 .where('id_reseller', resellers[key].id)
                 .andWhere('id_user', id_user)
                 .whereBetween('date', [datepast, today])
-                .select('price', 'commission');
+                .select('price', 'commission', 'paid', 'pay_date');
             for(const key in expense){
                 prejudice += expense[key].price_expense;
             }
@@ -79,11 +76,11 @@ module.exports = {
             
             const reseller = {
                 "name": resellers[key].name,
-                "sales": values.sale,
+                "sales": values.sales,
                 "profit": values.profit,
                 "prejudice": prejudice,
                 "commission": values.commission
-            }
+            };
             respost = respost.concat(reseller);
         }
         

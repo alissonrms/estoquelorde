@@ -10,21 +10,22 @@ module.exports = {
          installment, name_client, telephone_client, expire_date} = request.body;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
+
+    const resseler_exist = await connection('reseller')
+            .where('id', id_reseller)
+            .andWhere('id_user', id_user)
+            .andWhere('activated', true)
+            .select('name', 'id', 'activated')
+            .first();
     
     if(!id_user || !token || !id_reseller 
         || !products || !price
-        || !(price > 0) || !(commission > 0)){
+        || !(price > 0) || !(commission > 0)
+        || !await functions.verifyProducts(products, id_user)
+        || (installment && (!name_client || !telephone_client || !expire_date))
+        || !resseler_exist){
         return response.status(400).json({status: "Venda impossível"});
     }
-    if(installment == undefined && (!name_client || !telephone_client || !expire_date)){
-        return response.status(400).json({status: "Venda impossível"});
-    } 
-
-    if(!functions.verifyProducts(products, id_user)){
-        return response.status(400).json({status: "Venda impossível"});
-    }
-        
-    
 
     if(!id_sale){
         var date = new Date();
@@ -36,17 +37,10 @@ module.exports = {
         .first();
     }
 
-    const resseler_exist = await connection('reseller')
-            .where('id', id_reseller)
-            .andWhere('id_user', id_user)
-            .andWhere('activated', true)
-            .select('name', 'id', 'activated')
-            .first();
-
     
     const authentication = await cryptography.authenticate(id_user, token);
 
-    if(authentication && resseler_exist){
+    if(authentication){
         await connection('sale').insert({
             'date': date,
             'pay_date': date,
@@ -94,11 +88,11 @@ module.exports = {
             .where('id_user', id_user)
             .andWhere('id', sale.id)
             .update({
-                'paid': false
+                'paid': false,
+                'type': 'installment'
             })
         }
         
-       
         return response.status(200).json({status: "Venda realizada com sucesso"});
 
     }else{
@@ -145,6 +139,11 @@ module.exports = {
             .where("id", id_sale)
             .andWhere('id_user', id_user)
             .delete();
+        
+        await connection("installment")
+            .where("id_sale", id_sale)
+            .andWhere('id_user', id_user)
+            .delete();
 
         return response.status(204).send();
 
@@ -155,48 +154,48 @@ module.exports = {
   },
 
   async update(request, response){
-    const { id_reseller, id_sale, price, products, commission} = request.body;
+    const { id_reseller, id_sale, price, products, commission,
+        installment, name_client, telephone_client, expire_date} = request.body;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
+
+    var saleDate = connection('sale')
+        .where('id_user', id_user)
+        .andWhere('id', id_sale)
+        .select('id', 'date', 'pay_date')
+        .first();
+
+    const resseler_exist = await connection('reseller')
+        .where('id', id_reseller)
+        .andWhere('id_user', id_user)
+        .andWhere('activated', true)
+        .select('name', 'id', 'activated')
+        .first();
     
     if(!id_user || !token || !id_sale
-        || !id_reseller || !price || !products ||
-        !(commission > 0)){
+        || !id_reseller || !price || !products 
+        || !(commission > 0) || !(price > 0)
+        || !saleDate
+        || !await functions.verifyProducts(products, id_user, id_sale)
+        || (installment && (!name_client || !telephone_client || !expire_date))
+        || !resseler_exist){
         return response.status(400).json({status: "Atualização impossível"});
-    }
-
-    if(!functions.verifyProducts(products, id_user)){
-        return response.status(400).json({status: "Venda impossível"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
-        var sale = connection('sale')
-        .where('id_user', id_user)
-        .andWhere('id', id_sale)
-        .select('id')
-        .first();
 
-        if(!sale){
-            return response.status(400).json({status: "Atualização impossível"});
-        }
-
-        var date = connection('sale')
-        .where('id_user', id_user)
-        .andWhere('id', id_sale)
-        .select('date', 'pay_date')
-        .first();
-        
         await connection('sale').insert({
-            'date': date.date,
-            'pay_date': date.pay_date,
+            'date': saleDate.date,
+            'pay_date': saleDate.pay_date,
             'id_user': id_user,
             'id_reseller': id_reseller,
             'price': price,
             'commission': commission
         });
-        var sale = await connection('sale')
+
+        var saleId = await connection('sale')
         .max('id', {as: 'id'}).first();
         
         for (const key in products) {     
@@ -204,7 +203,7 @@ module.exports = {
                 'quantity': products[key].quantity,
                 'id_user': id_user,
                 'id_product': products[key].id_product,
-                'id_sale': sale.id
+                'id_sale': saleId.id
             });
             const queryStock = await connection('product')
                 .where('id', products[key].id_product)
@@ -220,6 +219,22 @@ module.exports = {
                 });
         }
 
+        if(installment){
+            await connection('installment').insert({
+                'name_client': name_client,
+                'telephone_client': telephone_client,
+                'expire_date': expire_date,
+                'id_user': id_user,
+                'id_sale': saleId.id
+            })
+            await connection('sale')
+            .where('id_user', id_user)
+            .andWhere('id', saleId.id)
+            .update({
+                'paid': false,
+                'type': 'installment'
+            })
+        }
 
 
         var sale = await connection('sale_product')
@@ -227,6 +242,7 @@ module.exports = {
             .where('sale.id_user', id_user)
             .andWhere('sale.id', id_sale)
             .select('sale_product.id_product', 'sale_product.quantity', 'sale_product.id');
+
         for(const key in sale){
             const product = await connection('product')
                 .where('id', sale[key].id_product)
@@ -246,6 +262,11 @@ module.exports = {
 
         await connection("sale")
             .where("id", id_sale)
+            .andWhere('id_user', id_user)
+            .delete();
+
+        await connection("installment")
+            .where("id_sale", id_sale)
             .andWhere('id_user', id_user)
             .delete();
 

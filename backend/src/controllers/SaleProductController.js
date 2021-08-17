@@ -4,7 +4,7 @@ const cryptography = require('./utilities/cryptography');
 
 module.exports = {
   async update(request, response){
-    const { id_sale_products, quantity} = request.body;
+    const { id_sale_products, quantity, id_product} = request.body;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
     
@@ -17,17 +17,25 @@ module.exports = {
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
+        var product = await connection('product')
+            .where('id_user', id_user)
+            .andWhere('id', id_product)
+            .select('stock', 'id')
+            .first();
+        if( product.stock < quantity){
+            return response.status(400).json({status: "Atualização impossível"});
+        }
+
         const sale_product = await connection("sale_product")
         .where("id_user", id_user)
         .andWhere('id', id_sale_products)
         .select("quantity", 'id_product')
         .first();
-        var product = await connection('product')
+        product = await connection('product')
             .where('id_user', id_user)
             .andWhere('id', sale_product.id_product)
             .select('stock', 'id')
             .first();
-        const stockOld = product.stock;
 
         await connection('product')
             .where('id_user', id_user)
@@ -36,22 +44,6 @@ module.exports = {
                 'stock': product.stock + sale_product.quantity
                 
             });
-
-        product = await connection('product')
-            .where('id_user', id_user)
-            .andWhere('id', id_product)
-            .select('stock', 'id')
-            .first();
-        if( product.stock < quantity){
-            await connection('product')
-            .where('id_user', id_user)
-            .andWhere('id', sale_product.id_product)
-            .update({
-                'stock': stockOld
-                
-            });
-            return response.status(400).json({status: "Atualização impossível"});
-        }
 
         await connection('sale_product')
             .where('id_user', id_user)

@@ -8,7 +8,7 @@ module.exports = {
     const sale = await connection('sale')
             .select('*');
 
-    return response.status(200).json(sale)
+    return response.status(200).json(sale);
 
   }
 

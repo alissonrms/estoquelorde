@@ -48,7 +48,7 @@ module.exports = {
       return response.status(403).json({status: "Logout imposível"});
     }
 
-    const authentication = await cryptography.authenticate(id, token);
+    const authentication = await cryptography.authenticate(id_user, token);
     if(authentication){
       await connection('user').where('id', id_user).update({
         "salt_session": null
