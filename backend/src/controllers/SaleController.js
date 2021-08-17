@@ -26,18 +26,9 @@ module.exports = {
         || !resseler_exist){
         return response.status(400).json({status: "Venda impossível"});
     }
-
-    if(!id_sale){
-        var date = new Date();
-    }else{
-        var date = connection('sale')
-        .where('id_user', id_user)
-        .andWhere('id', id_sale)
-        .select('date')
-        .first();
-    }
-
     
+    var date = new Date();
+
     const authentication = await cryptography.authenticate(id_user, token);
 
     if(authentication){
@@ -67,12 +58,11 @@ module.exports = {
                 .andWhere('id_user', id_user)
                 .select('stock')
                 .first();
-            const newStock = parseInt(queryStock.stock) - parseInt(products[key].quantity);
             await connection('product')
                 .where('id', products[key].id_product)
                 .andWhere('id_user', id_user)
                 .update({
-                    'stock': newStock
+                    'stock': parseInt(queryStock.stock) - parseInt(products[key].quantity)
                 });
         }
 

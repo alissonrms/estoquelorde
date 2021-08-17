@@ -6,16 +6,19 @@ module.exports = {
         var sales = 0;
         var commission = 0;
         var profit = 0;
+        var pending = 0;
         for(const key in sale){
             sales += 1;
             const com = sale[key].price * sale[key].commission / 100;
             commission += com;
-            if(sale[key].paid == true && sale[key].pay_date >= datepast && sale[key].pay_date <= today){
+            if(sale[key].paid == true){
                 profit += sale[key].price - com;
+            }else{
+                pending += sale[key].price - com;
             }
         }
 
-        return {sales, profit, commission};
+        return {sales, profit, commission, pending};
     },
 
     async verifyProducts(products, id_user, id_sale){
@@ -79,7 +82,8 @@ module.exports = {
                     'expense.date as date',
                     'expense.id as c4',
                     'reseller.id as c5',
-                    'expense.type as type')
+                    'expense.type as type',
+                    'expense.id_reseller as c6')
                     .from('expense')
                     .join('reseller', 'reseller.id', '=', 'expense.id_reseller')
                     .where('expense.id_user', id_user)
@@ -90,13 +94,16 @@ module.exports = {
                     .join('product', 'product.id', '=', 'sale_product.id_product')
                     .where('sale.id_user', id_user)
                     .whereBetween('sale.date', [datepast, today])
+                    .orWhereBetween('sale.pay_date', [datepast, today])
                     .select('sale.price',
                     'sale_product.quantity',
                     'product.name',
                     'sale.pay_date',
-                    'sale.id',
+                    'sale.type as sale_type',
                     'sale.commission',
-                    'sale_product.type as type')
+                    'sale_product.type as type',
+                    'sale.paid'
+                    )
                 ])
                 .unionAll([
                 connection('entry_product')
@@ -109,7 +116,9 @@ module.exports = {
                 'entry_product.date',
                 'entry_product.id',
                 'product.id',
-                'entry_product.type as type')
+                'entry_product.type as type',
+                'entry_product.id_product'
+                )
                 ])
                 .orderBy('date', 'desc').offset(offset).limit(limit);
     
@@ -126,8 +135,9 @@ module.exports = {
                     "quantity": "c2",
                     "name": "c3",
                     "date": "date",
-                    "id_sale": "c4",
-                    "commission": "c5"
+                    "sale_type": "c4",
+                    "commission": "c5",
+                    "paid": "c6"
                 }
                 const entry = {
                     "price": "c1",

@@ -33,6 +33,7 @@ module.exports = {
 
         const sale = await connection("sale")
         .whereBetween('date', [datepast, today])
+        .orWhereBetween('pay_date', [datepast, today])
         .andWhere('id_user', id_user)
         .select('price', 'commission', 'paid', 'pay_date');
 
@@ -42,7 +43,8 @@ module.exports = {
             "expense": expense[0].sum,
             "entry_product": total_entry_product,
             "sale": values.profit,
-            "commission": values.commission
+            "commission": values.commission,
+            "pending:": values.pending
         });
         
     }else{
