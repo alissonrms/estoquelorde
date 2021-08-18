@@ -67,7 +67,7 @@ module.exports = {
         return true;
     },
 
-    async queryListStatement(request, response, offset, limit){
+    async listStatement(request, response, offset, limit){
         const { datepast, today} = request.query;
         const token = request.headers.authorization;
         const  id_user = request.headers.id_user;
@@ -80,78 +80,88 @@ module.exports = {
 
         if(authentication){
             var result = await connection.select(
-                'expense.price_expense as c1',
+                    'expense.price_expense as c1',
                     'expense.description as c2',
                     'reseller.name as c3',
-                    'expense.date as date',
                     'expense.id as c4',
                     'reseller.id as c5',
+                    'expense.id_reseller as c6',
                     'expense.type as type',
-                    'expense.id_reseller as c6')
+                    'expense.date as date')
                     .from('expense')
                     .join('reseller', 'reseller.id', '=', 'expense.id_reseller')
                     .where('expense.id_user', id_user)
                     .whereBetween('expense.date', [datepast, today])
                     .unionAll([
-                    connection('sale_product')
-                    .join('sale', 'sale.id', '=', 'sale_product.id_sale')
-                    .join('product', 'product.id', '=', 'sale_product.id_product')
-                    .where('sale.id_user', id_user)
-                    .whereBetween('sale.date', [datepast, today])
-                    .orWhereBetween('sale.pay_date', [datepast, today])
-                    .andWhere('sale_product.id_user', id_user)
-                    .select('sale.price',
-                    'sale_product.quantity',
-                    'product.name',
-                    'sale.pay_date',
-                    'sale.type as sale_type',
-                    'sale.commission',
-                    'sale_product.type as type',
-                    'sale.paid'
-                    )
+                    connection('sale')
+                    .where('id_user', id_user)
+                    .whereBetween('date', [datepast, today])
+                    .orWhereBetween('pay_date', [datepast, today])
+                    .andWhere('id_user', id_user)
+                    .select(
+                        'price as c1',
+                        'id_reseller as c2',
+                        'id_user as c3',
+                        'commission as c4',
+                        'paid as c5',
+                        'id as c6',
+                        'type as type',
+                        'pay_date as date')
                 ])
                 .unionAll([
                 connection('entry_product')
                 .join('product', 'product.id', '=', 'entry_product.id_product')
                 .where('entry_product.id_user', id_user)
                 .whereBetween('entry_product.date', [datepast, today])
-                .select('entry_product.price_entry',
-                'entry_product.quantity',
-                'product.name',
-                'entry_product.date',
-                'entry_product.id',
-                'product.id',
-                'entry_product.type as type',
-                'entry_product.id_product'
-                )
+                .select(
+                    'entry_product.price_entry as c1',
+                    'entry_product.quantity as c2',
+                    'product.name as c3',
+                    'entry_product.id as c4',
+                    'product.id as c5',
+                    'entry_product.id_product as c6',
+                    'entry_product.date as date',
+                    'entry_product.type as type')
                 ])
                 .orderBy('date', 'desc').offset(offset).limit(limit);
     
-                const expense = {
-                    "price": "c1",
-                    "description": "c2",
-                    "name": "c3",
-                    "date": "date",
-                    "id_expense": "c4",
-                    "id_reseller": "c5"
+            const expense = {
+                "price": "c1",
+                "description": "c2",
+                "name": "c3",
+                "date": "date",
+                "id": "c4",
+                "id_reseller": "c5"
+            }
+            const sale = {
+                "price": "c1",
+                "id_reseller": "c2",
+                "id_user": "c3",
+                "date": "date",
+                "commission": "c4",
+                "paid": "c5",
+                "id": "c6"
+            }
+            const entry = {
+                "price": "c1",
+                "quantity": "c2",
+                "name": "c3",
+                "date": "date",
+                "id": "c4",
+                "id_product": "c5"
+            }
+
+            for(const key in result){
+                if(result[key].type == 'installment' 
+                || result[key].type == 'cash'){
+                    const products = await connection('sale_product')
+                        .join('product', 'product.id', '=', 'sale_product.id_product')
+                        .where('sale_product.id_sale', result[key].c6)
+                        .select('product.name', 'sale_product.quantity');
+                        
+                    result[key].products = products;
                 }
-                const sale = {
-                    "price": "c1",
-                    "quantity": "c2",
-                    "name": "c3",
-                    "date": "date",
-                    "sale_type": "c4",
-                    "commission": "c5",
-                    "paid": "c6"
-                }
-                const entry = {
-                    "price": "c1",
-                    "quantity": "c2",
-                    "name": "c3",
-                    "date": "date",
-                    "id_entry_product": "c4",
-                    "id_product": "c5"
-                }
+            }
 
             return response.json({result, expense, sale, entry});
         }else{

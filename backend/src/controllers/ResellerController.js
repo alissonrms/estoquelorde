@@ -46,19 +46,19 @@ module.exports = {
   },
 
   async delete(request, response){
-    const { reseller_id} = request.body;
+    const { reseller_id} = request.params;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 
+    
+    if(!id_user || !token || !reseller_id){
+        return response.status(400).json({status: "Operação não permitida"});
+    }
     const reseller = await connection("reseller")
         .where("id", reseller_id)
         .andWhere('id_user', id_user)
         .select('*')
         .first();
-
-    if(!id_user || !token || !reseller_id){
-        return response.status(400).json({status: "Operação não permitida"});
-    }
 
     if(!reseller){
         return response.status(400).json({status: "Revendedor não encontrado!"});

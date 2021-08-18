@@ -23,7 +23,7 @@ routes.put('/session', SessionController.logout);
 routes.post('/user', UserController.create);
 
 routes.post('/reseller', ResellerController.create);
-routes.delete('/reseller', ResellerController.delete);
+routes.delete('/reseller/:reseller_id', ResellerController.delete);
 routes.get('/reseller', ResellerController.list);
 routes.put('/reseller', ResellerController.update);
 

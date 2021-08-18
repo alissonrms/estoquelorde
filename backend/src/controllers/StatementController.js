@@ -55,7 +55,7 @@ module.exports = {
         return response.status(401).json({status: "Operação não permitida"});
     }
 
-    const respost = await functions.queryListStatement(request ,response, (5 * (page - 1)), 5);
+    const respost = await functions.listStatement(request ,response, (5 * (page - 1)), 5);
 
     return respost;
   }

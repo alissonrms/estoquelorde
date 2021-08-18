@@ -85,7 +85,7 @@ module.exports = {
 
   async list(request, response){
 
-    const respost = await functions.queryListStatement(request ,response, 0, 'ALL');
+    const respost = await functions.listStatement(request ,response, 0, 'ALL');
 
     return respost;
   }

@@ -29,6 +29,10 @@ module.exports = {
 
     async authenticate(id, token){
 
+        if(!id || !token){
+            return false;
+        }
+
         const result = await connection('user')
             .where('id', id)
             .select('salt_session')
