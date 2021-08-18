@@ -28,7 +28,7 @@ module.exports = {
                     .update({
                         "activated": true
                     });
-                return response.status(200).json({status: name + " cadastrado com sucesso"});
+                return response.status(200).json({status: reseller_name + " cadastrado com sucesso"});
             }
             await connection('reseller').insert({
                 "name": reseller_name,
@@ -50,8 +50,18 @@ module.exports = {
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 
+    const reseller = await connection("reseller")
+        .where("id", reseller_id)
+        .andWhere('id_user', id_user)
+        .select('*')
+        .first();
+
     if(!id_user || !token || !reseller_id){
-        return response.status(401).json({status: "Operação não permitida"});
+        return response.status(400).json({status: "Operação não permitida"});
+    }
+
+    if(!reseller){
+        return response.status(400).json({status: "Revendedor não encontrado!"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
@@ -75,10 +85,6 @@ module.exports = {
   async list(request, response){
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
-
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
-    }
     
     const authentication = await cryptography.authenticate(id_user, token);
 
@@ -120,7 +126,7 @@ module.exports = {
             });
             return response.status(200).json({status: name + " atualizado com sucesso"});
         }else{
-            return response.status(406).json({status: "Revendedor não encontrado"});
+            return response.status(400).json({status: "Revendedor não encontrado"});
         }
         
     }else{

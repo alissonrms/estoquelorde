@@ -35,7 +35,7 @@ module.exports = {
             return response.status(200).json({status: "Despesa cadastrada com sucesso"});
 
         }else{
-            return response.status(401).json({status: "Revendedor não encontrado!"});
+            return response.status(400).json({status: "Revendedor não encontrado!"});
         }
         
         
@@ -51,7 +51,7 @@ module.exports = {
     const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !expense_id){
-        return response.status(401).json({status: "Operação não permitida"});
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
@@ -105,7 +105,7 @@ module.exports = {
             });
             return response.status(200).json({status:"Despesa atualizada com sucesso"});
         }else{
-            return response.status(406).json({status: "Revendedor não encontrado"});
+            return response.status(400).json({status: "Revendedor não encontrado"});
         }
         
     }else{

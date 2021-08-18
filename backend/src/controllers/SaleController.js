@@ -6,7 +6,7 @@ const functions = require('./utilities/functions');
 module.exports = {
     
   async create(request, response){
-    const { id_reseller, products, price, commission, id_sale,
+    const { id_reseller, products, price, commission,
          installment, name_client, telephone_client, expire_date} = request.body;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
@@ -97,7 +97,7 @@ module.exports = {
     const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !id_sale){
-        return response.status(401).json({status: "Operação não permitida"});
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);

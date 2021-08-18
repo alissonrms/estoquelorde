@@ -60,7 +60,7 @@ module.exports = {
     const  id_user = request.headers.id_user;
 
     if(!id_user || !token || !entry_product_id){
-        return response.status(401).json({status: "Operação não permitida"});
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
@@ -78,7 +78,7 @@ module.exports = {
             .first();
         const stock = parseInt(resultB.stock) - parseInt(resultA.quantity);
         if(stock < 0){
-            return response.status(401).json({status: "Estoque insuficiente para realizar esta ação"});
+            return response.status(400).json({status: "Estoque insuficiente para realizar esta ação"});
         }
         await connection('product')
             .where("id", resultA.id_product)
@@ -135,7 +135,7 @@ module.exports = {
             if(resultB.id == resultC.id){
                 var stockA = parseInt(resultB.stock) + parseInt(stock_product) - parseInt(resultA.quantity);
                 if(stockA < 0){
-                    return response.status(401).json({status: "Estoque insuficiente para realizar esta ação"});
+                    return response.status(400).json({status: "Estoque insuficiente para realizar esta ação"});
                 }
                 await connection('product')
                 .where("id", id_product)

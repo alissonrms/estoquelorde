@@ -8,8 +8,8 @@ module.exports = {
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
+    if(!await functions.validateDates(datepast, today)){
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
@@ -17,20 +17,21 @@ module.exports = {
     if(authentication){
 
         const expense = await connection("expense")
+            .where('id_user', id_user)
             .whereBetween('date', [datepast, today])
-            .andWhere('id_user', id_user)
             .sum('price_expense as sum');
         
         const entry_product = await connection('entry_product')
+            .where('id_user', id_user)
             .whereBetween('date', [datepast, today])
-            .andWhere('id_user', id_user)
             .sum('price_entry as sum');
 
         const sale = await connection("sale")
-        .whereBetween('date', [datepast, today])
-        .orWhereBetween('pay_date', [datepast, today])
-        .andWhere('id_user', id_user)
-        .select('price', 'commission', 'paid', 'pay_date');
+            .where('id_user', id_user)
+            .whereBetween('date', [datepast, today])
+            .orWhereBetween('pay_date', [datepast, today])
+            .andWhere('id_user', id_user)
+            .select('price', 'commission', 'paid', 'pay_date');
 
         const values = await functions.calcSaleValues(sale, datepast, today);
 

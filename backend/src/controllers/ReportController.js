@@ -8,8 +8,8 @@ module.exports = {
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
+    if(!await functions.validateDates(datepast,today)){
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);
@@ -43,8 +43,8 @@ module.exports = {
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
+    if(!await functions.validateDates(datepast,today)){
+        return response.status(400).json({status: "Operação não permitida"});
     }
     
     const authentication = await cryptography.authenticate(id_user, token);

@@ -20,7 +20,7 @@ module.exports = {
             .select('name', 'activated', 'id')
             .first();
         if(result && result.activated){
-            return response.status(406).json({status: "Produto"+name+" já está cadastrado"});
+            return response.status(400).json({status: "Produto"+name+" já está cadastrado"});
         }else{
             if(result && !result.activated){
                 await connection('product')
@@ -76,10 +76,6 @@ module.exports = {
   async list(request, response){
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
-
-    if(!id_user || !token){
-        return response.status(401).json({status: "Operação não permitida"});
-    }
     
     const authentication = await cryptography.authenticate(id_user, token);
 
@@ -122,7 +118,7 @@ module.exports = {
             });
             return response.status(200).json({status: name + " atualizado com sucesso"});
         }else{
-            return response.status(406).json({status: "Produto não encontrado"});
+            return response.status(400).json({status: "Produto não encontrado"});
         }
         
     }else{

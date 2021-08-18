@@ -2,6 +2,14 @@ const connection = require('../../database/connection');
 const cryptography = require('./cryptography');
 
 module.exports = {
+    async validateDates(datepast, today){
+        if(!datepast || !today || !(datepast > 0) || Math.floor(datepast) != datepast
+            || !(today > 0) || Math.floor(today) != today){
+            return false;
+        }else{
+            return true;
+        }
+    },
     async calcSaleValues(sale, datepast, today){
         var sales = 0;
         var commission = 0;
@@ -64,12 +72,8 @@ module.exports = {
         const token = request.headers.authorization;
         const  id_user = request.headers.id_user;
 
-        if(!id_user || !token || !datepast || !today
-        || !(datepast > 0)
-        || Math.floor(datepast) != datepast
-        || !(today > 0)
-        || Math.floor(today) != today){
-            return response.status(401).json({status: "Operação não permitida"});
+        if(!await this.validateDates(datepast, today)){
+            return response.status(400).json({status: "Operação não permitida"});
         }
         
         const authentication = await cryptography.authenticate(id_user, token);
@@ -95,6 +99,7 @@ module.exports = {
                     .where('sale.id_user', id_user)
                     .whereBetween('sale.date', [datepast, today])
                     .orWhereBetween('sale.pay_date', [datepast, today])
+                    .andWhere('sale_product.id_user', id_user)
                     .select('sale.price',
                     'sale_product.quantity',
                     'product.name',

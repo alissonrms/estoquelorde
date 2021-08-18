@@ -25,7 +25,7 @@ module.exports = {
       const id_user = request.headers.id_user;
 
       if(!id_installment){
-        return response.status(401).json({status: "Pagamento impossível"});
+        return response.status(400).json({status: "Pagamento impossível"});
       }
 
       const authentication = await cryptography.authenticate(id_user, token);
@@ -54,7 +54,7 @@ module.exports = {
 
               return response.status(200).json({status: "Pagamento realizado com sucesso"});
           }else{
-            return response.status(401).json({status: "Pagamento impossível"});
+            return response.status(400).json({status: "Pagamento impossível"});
           }
 
         }else{
