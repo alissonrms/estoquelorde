@@ -20,7 +20,7 @@ module.exports = {
         }
     },
   async delete(request, response){
-      const {id_installment} = request.body;
+      const {id_installment} = request.params;
       const token = request.headers.authorization;
       const id_user = request.headers.id_user;
 

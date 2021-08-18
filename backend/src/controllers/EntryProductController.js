@@ -55,7 +55,7 @@ module.exports = {
   },
 
   async delete(request, response){
-    const { entry_product_id, } = request.body;
+    const { entry_product_id } = request.params;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 

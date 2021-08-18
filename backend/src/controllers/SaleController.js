@@ -92,7 +92,7 @@ module.exports = {
   },
 
   async delete(request, response){
-    const { id_sale } = request.body;
+    const { id_sale } = request.params;
     const token = request.headers.authorization;
     const  id_user = request.headers.id_user;
 

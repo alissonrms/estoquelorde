@@ -28,24 +28,24 @@ routes.get('/reseller', ResellerController.list);
 routes.put('/reseller', ResellerController.update);
 
 routes.post('/product', ProductController.create);
-routes.delete('/product', ProductController.delete);
+routes.delete('/product/:product_id', ProductController.delete);
 routes.get('/product', ProductController.list);
 routes.put('/product', ProductController.update);
 
 routes.post('/entryproduct', EntryProductController.create);
-routes.delete('/entryproduct', EntryProductController.delete);
+routes.delete('/entryproduct/:entry_product_id', EntryProductController.delete);
 routes.put('/entryproduct', EntryProductController.update);
 
 routes.post('/expense', ExpenseController.create);
-routes.delete('/expense', ExpenseController.delete);
+routes.delete('/expense/:expense_id', ExpenseController.delete);
 routes.put('/expense', ExpenseController.update);
 
 routes.post('/sale', saleController.create);
-routes.delete('/sale', saleController.delete);
+routes.delete('/sale/:id_sale', saleController.delete);
 routes.put('/sale', saleController.update);
 
 routes.get('/installment', installmentController.list);
-routes.delete('/installment', installmentController.delete);
+routes.delete('/installment/:id_installment', installmentController.delete);
 
 routes.put('/saleproduct', saleProductController.update);
 
