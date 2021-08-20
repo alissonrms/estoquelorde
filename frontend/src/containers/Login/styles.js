@@ -7,6 +7,7 @@ import boxLogo from '../../assets/box.png';
 export const BoxLogo = styled.img.attrs({
   src: `${boxLogo}`,
 })`
+  margin-top: 80px;
   width: 180px;
   height: 180px;
   margin-bottom: 25px;

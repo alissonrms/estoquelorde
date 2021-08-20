@@ -1,3 +1,24 @@
+const months = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro"
+];
+
+export function getFormatedMonthYear() {
+  var date = new Date();
+  var month = months[date.getMonth()];
+  return [month.slice(0, 3).toLowerCase(), date.getFullYear()].join(' ');
+}
+
 export function daysInMonth (month, year) {
   return new Date(year, month, 0).getDate();
 }

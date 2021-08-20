@@ -10,13 +10,26 @@ export const AuthProvider = ({ children }) => {
 
   const { setLoading } = useLoading();
 
+  api.interceptors.response.use(response => {
+    return response;
+  }, error => {
+    console.log('tesrsfasdfasdklfçjsadjkgdçasfjlsdj');
+    if(error.response.status === 401 || error.response.status === 403){
+      signOut();
+    }
+    return Promise.reject(error);
+  });
+
   useEffect(() => {
-    const storagedUserId = localStorage.getItem('@EstoqueLorde:userid');;
-    const storagedToken = localStorage.getItem('@EstoqueLorde:token');;
+    const storagedUserId = localStorage.getItem('@EstoqueLorde:userid');
+    const storagedToken = localStorage.getItem('@EstoqueLorde:token');
 
     if(storagedToken && storagedUserId){
       setUserId(storagedUserId);
       api.defaults.headers['Authorization'] = storagedToken;
+      api.defaults.headers['id_user'] = storagedUserId;
+    }else{
+      signOut();
     }
   }, []);
 
@@ -27,7 +40,6 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('session', { username, password });
 
       setUserId(response.data.id);
-      console.log("Id do usuário" + response.data.id);
       localStorage.setItem('@EstoqueLorde:userid', response.data.id);
       localStorage.setItem('@EstoqueLorde:token', response.data.token);
 

@@ -35,6 +35,7 @@ export const ItemsContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  align-items: center;
 `;
 
 export const CardItem = styled.div`
