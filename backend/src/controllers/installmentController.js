@@ -9,9 +9,19 @@ module.exports = {
         const authentication = await cryptography.authenticate(id_user, token);
 
         if(authentication){
-            const result = await connection("installment")
+            var result = await connection("installment")
                 .where("id_user", id_user)
-                .select("*");
+                .select("id", "name_client", "telephone_client", "expire_date", "id_sale");
+    
+
+            for(const key in result){
+                const products = await connection('sale_product')
+                        .join('product', 'product.id', '=', 'sale_product.id_product')
+                        .where('sale_product.id_sale', result[key].id_sale)
+                        .select('product.name', 'sale_product.quantity');
+                
+                result[key].products = products;
+            }
             
             return response.json(result);
     

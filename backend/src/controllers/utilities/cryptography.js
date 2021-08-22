@@ -3,7 +3,7 @@ const connection = require('../../database/connection');
 
 module.exports = {
     async sha512(password, salt){
-        var hash = crypto.createHmac('sha512', salt); // Algoritmo de cripto sha512
+        var hash = crypto.createHmac('sha512', salt);
         hash.update(password);
         hash = hash.digest('hex');
         return {
