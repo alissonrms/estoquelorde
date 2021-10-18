@@ -196,9 +196,9 @@ function Home() {
 
             <CardContainer>
               {threeResellersArray.map((resellersArray) => (
-                <ItemsContainer>
+                <ItemsContainer key={resellersArray.length}>
                   {resellersArray.map((reseller) => (
-                    <CardItem color={Colors.darkBlue}>
+                    <CardItem key={reseller.id} color={Colors.darkBlue}>
                       <ItemText size="large" weight="500">
                         {reseller.name}
                       </ItemText>

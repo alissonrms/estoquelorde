@@ -13,9 +13,12 @@ export const AuthProvider = ({ children }) => {
   api.interceptors.response.use(response => {
     return response;
   }, error => {
-    console.log('tesrsfasdfasdklfçjsadjkgdçasfjlsdj');
-    if(error.response.status === 401 || error.response.status === 403){
-      signOut();
+    if(error.response){
+      if(error.response.status){
+        if(error.response.status === 401 || error.response.status === 403){
+          signOut();
+        }
+      }
     }
     return Promise.reject(error);
   });
