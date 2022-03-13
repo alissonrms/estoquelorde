@@ -13,6 +13,18 @@ const ReportController = require('./controllers/ReportController');
 const Apagar = require('./controllers/Apagar');
 const installmentController = require('./controllers/installmentController');
 
+const cryptography = require('./controllers/utilities/cryptography');
+async function authenticate(request, response, next){
+    const token = request.headers.authorization;
+    const  id_user = request.headers.id_user;
+    const auth = await cryptography.authenticate(id_user, token);
+    if(auth){
+        next()
+    }else{
+        return response.status(401).json({status: "Operação não permitida"});
+    }
+}
+
 const routes = express.Router();
 
 routes.get('/apagar', Apagar.allUsers);
@@ -22,38 +34,38 @@ routes.put('/session', SessionController.logout);
 
 routes.post('/user', UserController.create);
 
-routes.post('/reseller', ResellerController.create);
-routes.delete('/reseller/:reseller_id', ResellerController.delete);
-routes.get('/reseller', ResellerController.list);
-routes.put('/reseller', ResellerController.update);
+routes.post('/reseller', authenticate, ResellerController.create);
+routes.delete('/reseller/:reseller_id', authenticate, ResellerController.delete);
+routes.get('/reseller', authenticate, ResellerController.list);
+routes.put('/reseller', authenticate, ResellerController.update);
 
-routes.post('/product', ProductController.create);
-routes.delete('/product/:product_id', ProductController.delete);
-routes.get('/product', ProductController.list);
-routes.put('/product', ProductController.update);
+routes.post('/product', authenticate, ProductController.create);
+routes.delete('/product/:product_id', authenticate, ProductController.delete);
+routes.get('/product', authenticate, ProductController.list);
+routes.put('/product', authenticate, ProductController.update);
 
-routes.post('/entryproduct', EntryProductController.create);
-routes.delete('/entryproduct/:entry_product_id', EntryProductController.delete);
-routes.put('/entryproduct', EntryProductController.update);
+routes.post('/entryproduct', authenticate, EntryProductController.create);
+routes.delete('/entryproduct/:entry_product_id', authenticate, EntryProductController.delete);
+routes.put('/entryproduct', authenticate, EntryProductController.update);
 
-routes.post('/expense', ExpenseController.create);
-routes.delete('/expense/:expense_id', ExpenseController.delete);
-routes.put('/expense', ExpenseController.update);
+routes.post('/expense', authenticate, ExpenseController.create);
+routes.delete('/expense/:expense_id', authenticate, ExpenseController.delete);
+routes.put('/expense', authenticate, ExpenseController.update);
 
-routes.post('/sale', saleController.create);
-routes.delete('/sale/:id_sale', saleController.delete);
-routes.put('/sale', saleController.update);
+routes.post('/sale', authenticate, saleController.create);
+routes.delete('/sale/:id_sale', authenticate, saleController.delete);
+routes.put('/sale', authenticate, saleController.update);
 
-routes.get('/installment', installmentController.list);
-routes.delete('/installment/:id_installment', installmentController.delete);
+routes.get('/installment', authenticate, installmentController.list);
+routes.delete('/installment/:id_installment', authenticate, installmentController.delete);
 
-routes.put('/saleproduct', saleProductController.update);
+//routes.put('/saleproduct', authenticate, saleProductController.update);
 
-routes.get('/statement-values', StatementController.values);
-routes.get('/statement-list', StatementController.list);
+routes.get('/statement-values', authenticate, StatementController.values);
+routes.get('/statement-list', authenticate, StatementController.list);
 
-routes.get('/report-product', ReportController.product);
-routes.get('/report-reseller', ReportController.reseller);
-routes.get('/report-statement', ReportController.list);
+routes.get('/report-product', authenticate, ReportController.product);
+routes.get('/report-reseller', authenticate, ReportController.reseller);
+routes.get('/report-statement', authenticate, ReportController.list);
 
 module.exports = routes;
